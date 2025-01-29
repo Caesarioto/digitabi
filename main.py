@@ -40,12 +40,12 @@ def prev_page():
 
 # --- Seiteninhalt ---
 if st.session_state.page == 0:
-    st.image("/workspaces/digitabi/bildname.png", width=300)
+    st.image("bildname.png", width=300)
     st.title("Berechne in unter 1 Minute wie viel dein Abibuch kostet!")
     st.button("Los geht's!", on_click=next_page)
 
 elif st.session_state.page == 1:
-    st.image("/workspaces/digitabi/bildname.png", width=300)
+    st.image("bildname.png", width=300)
     st.title("Mein Digitales Abibuch")
     st.subheader("Für welches Jahr ist dein Abibuch?")
     
@@ -59,7 +59,7 @@ elif st.session_state.page == 1:
     col2.button("Weiter", on_click=next_page)
 
 elif st.session_state.page == 2:
-    st.image("/workspaces/digitabi/bildname.png", width=300)
+    st.image("bildname.png", width=300)
     st.title("Wie viele Personen sollen ein Abibuch bekommen?")
 
     st.session_state.selected_persons = st.slider("Anzahl Personen", min_value=1, max_value=170, value=85)
@@ -70,7 +70,7 @@ elif st.session_state.page == 2:
     col2.button("Weiter", on_click=next_page)
 
 elif st.session_state.page == 3:
-    st.image("/workspaces/digitabi/bildname.png", width=300)
+    st.image("bildname.png", width=300)
     st.title("Möchtest du eine digitale Version deines Abibuchs?")
     
     st.session_state.selected_digital_option = st.radio(
@@ -82,7 +82,7 @@ elif st.session_state.page == 3:
     col2.button("Weiter", on_click=next_page)
 
 elif st.session_state.page == 4:
-    st.image("/workspaces/digitabi/bildname.png", width=300)
+    st.image("bildname.png", width=300)
     st.title("Welche Inhalte möchtest du in deinem Abibuch?")
     
     options = ["Lehrer-Steckbriefe", "Schüler-Steckbriefe", "Videos", "Sprachmemos", 
@@ -95,7 +95,7 @@ elif st.session_state.page == 4:
     col2.button("Weiter", on_click=next_page)
 
 elif st.session_state.page == 5:
-    st.image("/workspaces/digitabi/bildname.png", width=300)
+    st.image("bildname.png", width=300)
     st.title("Wie viel Speicherplatz benötigst du für deine digitale Version?")
     
     st.session_state.selected_storage = st.radio(
@@ -107,7 +107,7 @@ elif st.session_state.page == 5:
     col2.button("Weiter", on_click=next_page)
 
 elif st.session_state.page == 6:
-    st.image("/workspaces/digitabi/bildname.png", width=300)
+    st.image("bildname.png", width=300)
     st.title("Welche Maße soll dein Abibuch haben?")
     
     st.session_state.selected_size = st.radio(
@@ -119,7 +119,7 @@ elif st.session_state.page == 6:
     col2.button("Weiter", on_click=next_page)
 
 elif st.session_state.page == 7:
-    st.image("/workspaces/digitabi/bildname.png", width=300)
+    st.image("bildname.png", width=300)
     st.title("Welche Art von Cover soll dein Abibuch haben?")
     
     st.session_state.selected_cover = st.radio(
@@ -131,7 +131,7 @@ elif st.session_state.page == 7:
     col2.button("Weiter", on_click=next_page)
 
 elif st.session_state.page == 8:
-    st.image("/workspaces/digitabi/bildname.png", width=300)
+    st.image("bildname.png", width=300)
     st.title("Meine Auswahl")
 
     st.write(f"**Jahr:** {st.session_state.selected_year}")
