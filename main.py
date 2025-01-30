@@ -144,6 +144,14 @@ elif st.session_state.page == 8:
 
     st.write(f"**Jahr:** {st.session_state.selected_year}")
     st.write(f"**Anzahl Personen:** {st.session_state.selected_persons}")
-    st.write(f"**Digitale
+    st.write(f"**Digitale Version:** {st.session_state.selected_digital_option}")
+    st.write(f"**Ausgewählte Inhalte:** {', '.join(st.session_state.selected_content) if st.session_state.selected_content else 'Keine Auswahl'}")
+    st.write(f"**Speicherplatz:** {st.session_state.selected_storage if st.session_state.selected_storage else 'Keine Auswahl'}")
 
+    if st.session_state.selected_digital_option != "Nur digital":
+        st.write(f"**Buchgröße:** {st.session_state.selected_size if st.session_state.selected_size else 'Keine Auswahl'}")
+        st.write(f"**Cover:** {st.session_state.selected_cover if st.session_state.selected_cover else 'Keine Auswahl'}")
 
+    col1, col2 = st.columns(2)
+    col1.button("Zurück", on_click=prev_page)
+    col2.button("Bestätigen", on_click=lambda: st.success("Vielen Dank für deine Auswahl!"))
