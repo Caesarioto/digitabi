@@ -1,6 +1,4 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 
 # --- Globale Session State Variablen ---
 if "page" not in st.session_state:
@@ -30,11 +28,18 @@ if "selected_cover" not in st.session_state:
 
 # --- Navigation zwischen den Seiten ---
 def next_page():
-    st.session_state.page += 1
+    """ Geht zur nächsten Seite und überspringt Cover & Format, falls 'Nur digital' gewählt wurde. """
+    if st.session_state.page == 3 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 5  # Springt direkt zur Speicherplatz-Seite (Seite 5)
+    else:
+        st.session_state.page += 1
 
 
 def prev_page():
-    if st.session_state.page > 0:
+    """ Geht zur vorherigen Seite und berücksichtigt, ob 'Nur digital' gewählt wurde. """
+    if st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 3  # Springt direkt zurück zur digitalen Auswahl
+    else:
         st.session_state.page -= 1
 
 
@@ -49,7 +54,7 @@ elif st.session_state.page == 1:
     st.title("Mein Digitales Abibuch")
     st.subheader("Für welches Jahr ist dein Abibuch?")
     
-    current_year = 2025  # Falls du dynamisch willst: datetime.datetime.now().year
+    current_year = 2025
     years = [current_year - 1, current_year, current_year + 1, current_year + 2]
     
     st.session_state.selected_year = st.radio("Jahr auswählen", years)
@@ -106,7 +111,7 @@ elif st.session_state.page == 5:
     col1.button("Zurück", on_click=prev_page)
     col2.button("Weiter", on_click=next_page)
 
-elif st.session_state.page == 6:
+elif st.session_state.page == 6 and st.session_state.selected_digital_option != "Nur digital":
     st.image("bildname.png", width=300)
     st.title("Welche Maße soll dein Abibuch haben?")
     
@@ -118,7 +123,7 @@ elif st.session_state.page == 6:
     col1.button("Zurück", on_click=prev_page)
     col2.button("Weiter", on_click=next_page)
 
-elif st.session_state.page == 7:
+elif st.session_state.page == 7 and st.session_state.selected_digital_option != "Nur digital":
     st.image("bildname.png", width=300)
     st.title("Welche Art von Cover soll dein Abibuch haben?")
     
@@ -139,10 +144,11 @@ elif st.session_state.page == 8:
     st.write(f"**Digitale Version:** {st.session_state.selected_digital_option}")
     st.write(f"**Ausgewählte Inhalte:** {', '.join(st.session_state.selected_content) if st.session_state.selected_content else 'Keine Auswahl'}")
     st.write(f"**Speicherplatz:** {st.session_state.selected_storage if st.session_state.selected_storage else 'Keine Auswahl'}")
-    st.write(f"**Buchgröße:** {st.session_state.selected_size if st.session_state.selected_size else 'Keine Auswahl'}")
-    st.write(f"**Cover:** {st.session_state.selected_cover if st.session_state.selected_cover else 'Keine Auswahl'}")
+
+    if st.session_state.selected_digital_option != "Nur digital":
+        st.write(f"**Buchgröße:** {st.session_state.selected_size if st.session_state.selected_size else 'Keine Auswahl'}")
+        st.write(f"**Cover:** {st.session_state.selected_cover if st.session_state.selected_cover else 'Keine Auswahl'}")
 
     col1, col2 = st.columns(2)
     col1.button("Zurück", on_click=prev_page)
     col2.button("Bestätigen", on_click=lambda: st.success("Vielen Dank für deine Auswahl!"))
-
