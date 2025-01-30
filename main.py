@@ -28,17 +28,19 @@ if "selected_cover" not in st.session_state:
 
 # --- Navigation zwischen den Seiten ---
 def next_page():
-    """ Geht zur nächsten Seite und überspringt Cover & Format, falls 'Nur digital' gewählt wurde. """
-    if st.session_state.page == 3 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 5  # Springt direkt zur Speicherplatz-Seite (Seite 5)
+    """ Wechselt zur nächsten Seite und überspringt Format & Cover, falls 'Nur digital' gewählt wurde. """
+    if st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 8  # Springt direkt zur Zusammenfassung
     else:
         st.session_state.page += 1
 
 
 def prev_page():
     """ Geht zur vorherigen Seite und berücksichtigt, ob 'Nur digital' gewählt wurde. """
-    if st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 3  # Springt direkt zurück zur digitalen Auswahl
+    if st.session_state.page == 8 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 5  # Springt zurück zur Speicherplatz-Seite
+    elif st.session_state.page == 6 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 5  # Falls Nutzer zurückgeht, springt er direkt zur Speicherplatz-Seite
     else:
         st.session_state.page -= 1
 
@@ -111,6 +113,7 @@ elif st.session_state.page == 5:
     col1.button("Zurück", on_click=prev_page)
     col2.button("Weiter", on_click=next_page)
 
+# Falls "Nur digital" gewählt wurde, wird Seite 6 & 7 übersprungen!
 elif st.session_state.page == 6 and st.session_state.selected_digital_option != "Nur digital":
     st.image("bildname.png", width=300)
     st.title("Welche Maße soll dein Abibuch haben?")
