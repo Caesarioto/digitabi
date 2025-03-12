@@ -1,6 +1,7 @@
 import streamlit as st
+import streamlit as st
 
-# --- Globale Session State Variablen ---
+# --- Initialize Session State Variables ---
 if "page" not in st.session_state:
     st.session_state.page = 0
 
@@ -26,47 +27,59 @@ if "selected_cover" not in st.session_state:
     st.session_state.selected_cover = None
 
 
-# --- Navigation zwischen den Seiten ---
+# --- Navigation Functions ---
 def next_page():
-    """Navigates to the next page and correctly skips pages if 'Nur digital' is selected."""
+    """Moves to the next page, ensuring correct skipping of pages based on digital selection."""
 
     if st.session_state.page == 3:
-        st.session_state.page += 1  # Always go to Page 4 first
+        st.session_state.page = 4  # Always go to page 4
 
     elif st.session_state.page == 4:
-        st.session_state.page = 5  # Move to Page 5
+        st.session_state.page = 5  # Move to page 5
 
     elif st.session_state.page == 5:
         if st.session_state.selected_digital_option == "Nur digital":
-            st.session_state.page = 8  # Skip pages 6 and 7
+            st.session_state.page = 8  # Skip pages 6 & 7
         else:
-            st.session_state.page += 1
+            st.session_state.page += 1  # Move to page 6
 
-    elif st.session_state.page in [6, 7] and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 8  # Ensure direct jump to page 8
+    elif st.session_state.page == 6:
+        if st.session_state.selected_digital_option == "Nur digital":
+            st.session_state.page = 8  # Skip page 7
+        else:
+            st.session_state.page += 1  # Move to page 7
+
+    elif st.session_state.page == 7:
+        if st.session_state.selected_digital_option == "Nur digital":
+            st.session_state.page = 8  # Skip directly to page 8
+        else:
+            st.session_state.page += 1  # Move to page 8
 
     else:
         st.session_state.page += 1
 
-    st.rerun()  # 🔹 Ensure UI refresh
+    st.rerun()  # 🔹 Force UI refresh
 
 
 def prev_page():
-    """Navigates to the previous page while considering 'Nur digital' selection."""
-    
+    """Moves back, ensuring correct skipping of pages 6 & 7 if 'Nur digital' is selected."""
+
     if st.session_state.page == 8 and st.session_state.selected_digital_option == "Nur digital":
         st.session_state.page = 5  # Jump back to Speicherplatz
 
-    elif st.session_state.page in [7, 6] and st.session_state.selected_digital_option == "Nur digital":
+    elif st.session_state.page == 7 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 5  # Skip back to Speicherplatz
+
+    elif st.session_state.page == 6 and st.session_state.selected_digital_option == "Nur digital":
         st.session_state.page = 5  # Skip back to Speicherplatz
 
     else:
         st.session_state.page -= 1
 
-    st.rerun()  # 🔹 Ensure UI refresh
+    st.rerun()  # 🔹 Force UI refresh
 
 
-# --- Seiteninhalt ---
+# --- Page Content ---
 if st.session_state.page == 0:
     st.image("bildname.png", width=300)
     st.title("Berechne in unter 1 Minute wie viel dein Abibuch kostet!")
@@ -105,7 +118,6 @@ elif st.session_state.page == 3:
                                index=["Ja", "Nein", "Nur digital"].index(st.session_state.selected_digital_option) 
                                if st.session_state.selected_digital_option else 0)
 
-    # Update session state before proceeding
     if selected_option != st.session_state.selected_digital_option:
         st.session_state.selected_digital_option = selected_option  
 
@@ -171,14 +183,9 @@ elif st.session_state.page == 8:
     st.write(f"**Digitale Version:** {st.session_state.selected_digital_option}")
     st.write(f"**Speicherplatz:** {st.session_state.selected_storage}")
 
-    if st.session_state.selected_digital_option != "Nur digital":
-        st.write(f"**Buchgröße:** {st.session_state.selected_size}")
-        st.write(f"**Cover:** {st.session_state.selected_cover}")
-
     col1, col2 = st.columns(2)
     col1.button("Zurück", on_click=prev_page)
     col2.button("Bestätigen", on_click=lambda: st.success("Vielen Dank für deine Auswahl!"))
-
 
 
 
