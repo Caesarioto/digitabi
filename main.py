@@ -28,9 +28,13 @@ if "selected_cover" not in st.session_state:
 
 # --- Navigation zwischen den Seiten ---
 def next_page():
-    """ Wechselt zur nächsten Seite und überspringt Format & Cover, falls 'Nur digital' gewählt wurde. """
-    if st.session_state.page == 3 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 5  # Skip pages 4 and 5
+    """Wechselt zur nächsten Seite und überspringt Format & Cover, falls 'Nur digital' gewählt wurde."""
+    if st.session_state.page == 3:
+        # Ensure the selection is updated before checking it
+        if "selected_digital_option" in st.session_state and st.session_state.selected_digital_option == "Nur digital":
+            st.session_state.page = 5  # Skip pages 4 and 5
+        else:
+            st.session_state.page += 1
     elif st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
         st.session_state.page = 8  # Skip pages 6 and 7
     else:
@@ -82,14 +86,16 @@ elif st.session_state.page == 2:
 elif st.session_state.page == 3:
     st.image("bildname.png", width=300)
     st.title("Möchtest du eine digitale Version deines Abibuchs?")
-    
-    st.session_state.selected_digital_option = st.radio(
-        "Digitale Version?", ["Ja", "Nein", "Nur digital"]
-    )
+
+    selected_option = st.radio("Digitale Version?", ["Ja", "Nein", "Nur digital"])
+
+    if selected_option != st.session_state.selected_digital_option:
+        st.session_state.selected_digital_option = selected_option  # Update value first
 
     col1, col2 = st.columns(2)
     col1.button("Zurück", on_click=prev_page)
     col2.button("Weiter", on_click=next_page)
+
 
 elif st.session_state.page == 4:
     st.image("bildname.png", width=300)
