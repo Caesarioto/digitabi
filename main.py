@@ -29,10 +29,13 @@ if "selected_cover" not in st.session_state:
 # --- Navigation zwischen den Seiten ---
 def next_page():
     """ Wechselt zur nächsten Seite und überspringt Format & Cover, falls 'Nur digital' gewählt wurde. """
-    if st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 8  # Überspringe Seiten 6 und 7 (Format und Cover)
+    if st.session_state.page == 3 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 5  # Skip pages 4 and 5
+    elif st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 8  # Skip pages 6 and 7
     else:
         st.session_state.page += 1
+
 
 
 def prev_page():
