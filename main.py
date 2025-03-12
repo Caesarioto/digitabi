@@ -53,11 +53,6 @@ def next_page():
 
     st.experimental_rerun()  # 🔹 Forces Streamlit to refresh immediately after a page change
 
-    else:
-        st.session_state.page += 1
-
-    st.experimental_rerun()  # 🔹 Forces Streamlit to refresh immediately after a page change
-
 
 def prev_page():
     """Navigates to the previous page while considering 'Nur digital' selection."""
@@ -186,6 +181,7 @@ elif st.session_state.page == 8:
     col1, col2 = st.columns(2)
     col1.button("Zurück", on_click=prev_page)
     col2.button("Bestätigen", on_click=lambda: st.success("Vielen Dank für deine Auswahl!"))
+
 
 
 
