@@ -31,7 +31,6 @@ def next_page():
     """Wechselt zur nächsten Seite und überspringt Format & Cover, falls 'Nur digital' gewählt wurde."""
     
     if st.session_state.page == 3:
-        # Ensure the selection is updated before checking it
         if st.session_state.selected_digital_option == "Nur digital":
             st.session_state.page = 5  # Skip pages 4 and 5
         else:
@@ -40,18 +39,25 @@ def next_page():
     elif st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
         st.session_state.page = 8  # Skip pages 6 and 7
 
+    elif st.session_state.page in [6, 7] and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 8  # Ensure direct jump if user somehow lands here
+
     else:
         st.session_state.page += 1
 
 
 
 
+
 def prev_page():
-    """ Geht zur vorherigen Seite und berücksichtigt, ob 'Nur digital' gewählt wurde. """
+    """Geht zur vorherigen Seite und berücksichtigt, ob 'Nur digital' gewählt wurde."""
+    
     if st.session_state.page == 8 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 5  # Springt zurück zur Speicherplatz-Seite
-    elif st.session_state.page == 6 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 5  # Springt direkt zur Speicherplatz-Seite
+
+    elif st.session_state.page in [7, 6] and st.session_state.selected_digital_option == "Nur digital":
         st.session_state.page = 5  # Falls Nutzer zurückgeht, springt er direkt zur Speicherplatz-Seite
+
     else:
         st.session_state.page -= 1
 
@@ -147,6 +153,7 @@ elif st.session_state.page == 6:
         col1.button("Zurück", on_click=prev_page)
         col2.button("Weiter", on_click=next_page)
 
+
 elif st.session_state.page == 7:
     if st.session_state.selected_digital_option == "Nur digital":
         st.session_state.page = 8  # Skip to summary
@@ -162,6 +169,7 @@ elif st.session_state.page == 7:
         col1, col2 = st.columns(2)
         col1.button("Zurück", on_click=prev_page)
         col2.button("Weiter", on_click=next_page)
+
 
 
 elif st.session_state.page == 8:
