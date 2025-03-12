@@ -138,7 +138,7 @@ elif st.session_state.page == 5:
     col1.button("Zurück", on_click=prev_page)
     col2.button("Weiter", on_click=next_page)
 
-elif st.session_state.page == 6:
+elif st.session_state.page == 6 and st.session_state.selected_digital_option != "Nur digital":
     st.image("bildname.png", width=300)
     st.title("Welche Maße soll dein Abibuch haben?")
     
@@ -150,7 +150,7 @@ elif st.session_state.page == 6:
     col1.button("Zurück", on_click=prev_page)
     col2.button("Weiter", on_click=next_page)
 
-elif st.session_state.page == 7:
+elif st.session_state.page == 7 and st.session_state.selected_digital_option != "Nur digital":
     st.image("bildname.png", width=300)
     st.title("Welche Art von Cover soll dein Abibuch haben?")
 
@@ -171,7 +171,14 @@ elif st.session_state.page == 8:
     st.write(f"**Digitale Version:** {st.session_state.selected_digital_option}")
     st.write(f"**Speicherplatz:** {st.session_state.selected_storage}")
 
+    if st.session_state.selected_digital_option != "Nur digital":
+        st.write(f"**Buchgröße:** {st.session_state.selected_size}")
+        st.write(f"**Cover:** {st.session_state.selected_cover}")
+
     col1, col2 = st.columns(2)
     col1.button("Zurück", on_click=prev_page)
     col2.button("Bestätigen", on_click=lambda: st.success("Vielen Dank für deine Auswahl!"))
+
+
+
 
