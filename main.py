@@ -28,7 +28,7 @@ if "selected_cover" not in st.session_state:
 
 # --- Navigation zwischen den Seiten ---
 def next_page():
-    """Wechselt zur nächsten Seite und überspringt Format & Cover, falls 'Nur digital' gewählt wurde."""
+    """Navigates to the next page and skips Format & Cover pages if 'Nur digital' is selected."""
     
     if st.session_state.page == 3:
         if st.session_state.selected_digital_option == "Nur digital":
@@ -39,27 +39,28 @@ def next_page():
     elif st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
         st.session_state.page = 8  # Skip pages 6 and 7
 
-    elif st.session_state.page in [6, 7] and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 8  # Ensure direct jump if user somehow lands here
-
     else:
         st.session_state.page += 1
+
+    st.experimental_rerun()  # Force rerun to apply page change immediately
 
 
 
 
 
 def prev_page():
-    """Geht zur vorherigen Seite und berücksichtigt, ob 'Nur digital' gewählt wurde."""
+    """Navigates to the previous page while considering 'Nur digital' selection."""
     
     if st.session_state.page == 8 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 5  # Springt direkt zur Speicherplatz-Seite
+        st.session_state.page = 5  # Jump back to storage selection
 
     elif st.session_state.page in [7, 6] and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 5  # Falls Nutzer zurückgeht, springt er direkt zur Speicherplatz-Seite
+        st.session_state.page = 5  # Skip back to Speicherplatz page
 
     else:
         st.session_state.page -= 1
+
+    st.experimental_rerun()  # Force rerun to apply page change immediately
 
 
 # --- Seiteninhalt ---
@@ -139,8 +140,8 @@ elif st.session_state.page == 5:
 # Falls "Nur digital" gewählt wurde, wird Seite 6 & 7 übersprungen!
 elif st.session_state.page == 6:
     if st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 8  # Skip page 6 and 7
-        st.experimental_rerun()  # Force rerun to prevent page 6 from showing
+        st.session_state.page = 8  # Skip pages 6 and 7
+        st.experimental_rerun()  # Ensure UI updates immediately
     else:
         st.image("bildname.png", width=300)
         st.title("Welche Maße soll dein Abibuch haben?")
@@ -153,11 +154,10 @@ elif st.session_state.page == 6:
         col1.button("Zurück", on_click=prev_page)
         col2.button("Weiter", on_click=next_page)
 
-
 elif st.session_state.page == 7:
     if st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 8  # Skip to summary
-        st.experimental_rerun()
+        st.session_state.page = 8  # Skip directly to summary
+        st.experimental_rerun()  # Ensure UI updates immediately
     else:
         st.image("bildname.png", width=300)
         st.title("Welche Art von Cover soll dein Abibuch haben?")
@@ -169,7 +169,6 @@ elif st.session_state.page == 7:
         col1, col2 = st.columns(2)
         col1.button("Zurück", on_click=prev_page)
         col2.button("Weiter", on_click=next_page)
-
 
 
 elif st.session_state.page == 8:
