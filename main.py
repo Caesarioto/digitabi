@@ -31,13 +31,10 @@ def next_page():
     """Navigates to the next page and correctly skips pages if 'Nur digital' is selected."""
 
     if st.session_state.page == 3:
-        if st.session_state.selected_digital_option == "Nur digital":
-            st.session_state.page = 4  # Show page 4 (corrected)
-        else:
-            st.session_state.page += 1
+        st.session_state.page += 1  # Always go to Page 4 first
 
     elif st.session_state.page == 4:
-        st.session_state.page = 5  # Always go to 5 from 4
+        st.session_state.page = 5  # Move to Page 5
 
     elif st.session_state.page == 5:
         if st.session_state.selected_digital_option == "Nur digital":
@@ -46,27 +43,27 @@ def next_page():
             st.session_state.page += 1
 
     elif st.session_state.page in [6, 7] and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 8  # Ensure direct jump if user somehow lands here
+        st.session_state.page = 8  # Ensure direct jump to page 8
 
     else:
         st.session_state.page += 1
 
-    st.experimental_rerun()  # 🔹 Forces Streamlit to refresh immediately after a page change
+    st.rerun()  # 🔹 Ensure UI refresh
 
 
 def prev_page():
     """Navigates to the previous page while considering 'Nur digital' selection."""
     
     if st.session_state.page == 8 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 5  # Jump back to Speicherplatz selection
+        st.session_state.page = 5  # Jump back to Speicherplatz
 
     elif st.session_state.page in [7, 6] and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 5  # Skip back to Speicherplatz page
+        st.session_state.page = 5  # Skip back to Speicherplatz
 
     else:
         st.session_state.page -= 1
 
-    st.experimental_rerun()  # 🔹 Forces Streamlit to refresh immediately after a page change
+    st.rerun()  # 🔹 Ensure UI refresh
 
 
 # --- Seiteninhalt ---
