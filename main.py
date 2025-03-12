@@ -29,16 +29,20 @@ if "selected_cover" not in st.session_state:
 # --- Navigation zwischen den Seiten ---
 def next_page():
     """Wechselt zur nächsten Seite und überspringt Format & Cover, falls 'Nur digital' gewählt wurde."""
+    
     if st.session_state.page == 3:
         # Ensure the selection is updated before checking it
-        if "selected_digital_option" in st.session_state and st.session_state.selected_digital_option == "Nur digital":
+        if st.session_state.selected_digital_option == "Nur digital":
             st.session_state.page = 5  # Skip pages 4 and 5
         else:
             st.session_state.page += 1
+
     elif st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
         st.session_state.page = 8  # Skip pages 6 and 7
+
     else:
         st.session_state.page += 1
+
 
 
 
@@ -87,14 +91,18 @@ elif st.session_state.page == 3:
     st.image("bildname.png", width=300)
     st.title("Möchtest du eine digitale Version deines Abibuchs?")
 
-    selected_option = st.radio("Digitale Version?", ["Ja", "Nein", "Nur digital"])
+    selected_option = st.radio("Digitale Version?", ["Ja", "Nein", "Nur digital"], 
+                               index=["Ja", "Nein", "Nur digital"].index(st.session_state.selected_digital_option) 
+                               if st.session_state.selected_digital_option else 0)
 
+    # Update session state before proceeding
     if selected_option != st.session_state.selected_digital_option:
-        st.session_state.selected_digital_option = selected_option  # Update value first
+        st.session_state.selected_digital_option = selected_option  
 
     col1, col2 = st.columns(2)
     col1.button("Zurück", on_click=prev_page)
     col2.button("Weiter", on_click=next_page)
+
 
 
 elif st.session_state.page == 4:
@@ -123,29 +131,38 @@ elif st.session_state.page == 5:
     col2.button("Weiter", on_click=next_page)
 
 # Falls "Nur digital" gewählt wurde, wird Seite 6 & 7 übersprungen!
-elif st.session_state.page == 6 and st.session_state.selected_digital_option != "Nur digital":
-    st.image("bildname.png", width=300)
-    st.title("Welche Maße soll dein Abibuch haben?")
-    
-    st.session_state.selected_size = st.radio(
-        "Buchgröße wählen:", ["DIN A4 (210x297 mm)", "Buchformat (170x210 mm)"]
-    )
+elif st.session_state.page == 6:
+    if st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 8  # Skip page 6 and 7
+        st.experimental_rerun()  # Force rerun to prevent page 6 from showing
+    else:
+        st.image("bildname.png", width=300)
+        st.title("Welche Maße soll dein Abibuch haben?")
+        
+        st.session_state.selected_size = st.radio(
+            "Buchgröße wählen:", ["DIN A4 (210x297 mm)", "Buchformat (170x210 mm)"]
+        )
 
-    col1, col2 = st.columns(2)
-    col1.button("Zurück", on_click=prev_page)
-    col2.button("Weiter", on_click=next_page)
+        col1, col2 = st.columns(2)
+        col1.button("Zurück", on_click=prev_page)
+        col2.button("Weiter", on_click=next_page)
 
-elif st.session_state.page == 7 and st.session_state.selected_digital_option != "Nur digital":
-    st.image("bildname.png", width=300)
-    st.title("Welche Art von Cover soll dein Abibuch haben?")
-    
-    st.session_state.selected_cover = st.radio(
-        "Cover wählen:", ["Hard-Cover", "Soft-Cover"]
-    )
+elif st.session_state.page == 7:
+    if st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 8  # Skip to summary
+        st.experimental_rerun()
+    else:
+        st.image("bildname.png", width=300)
+        st.title("Welche Art von Cover soll dein Abibuch haben?")
 
-    col1, col2 = st.columns(2)
-    col1.button("Zurück", on_click=prev_page)
-    col2.button("Weiter", on_click=next_page)
+        st.session_state.selected_cover = st.radio(
+            "Cover wählen:", ["Hard-Cover", "Soft-Cover"]
+        )
+
+        col1, col2 = st.columns(2)
+        col1.button("Zurück", on_click=prev_page)
+        col2.button("Weiter", on_click=next_page)
+
 
 elif st.session_state.page == 8:
     st.image("bildname.png", width=300)
