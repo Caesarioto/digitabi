@@ -22,6 +22,9 @@ def go_to_page(page):
     if st.session_state.page != page:
         st.session_state.history.append(st.session_state.page)
         st.session_state.page = page
+        st.session_state._rerun = True
+
+        # Workaround to trigger rerun after session state update
         st.experimental_rerun()
 
 def go_back():
@@ -44,8 +47,8 @@ def page_2():
     st.header("Für welches Jahr ist dein Abibuch?")
     current = datetime.now().year
     options = [current - 1, current, current + 1, current + 2]
-    choice = st.radio("", options)
-    if choice:
+    choice = st.radio("", options, key="year")
+    if choice is not None:
         st.session_state.selected_year = choice
         go_to_page(3)
     st.button("Zurück", on_click=go_back)
@@ -53,9 +56,9 @@ def page_2():
 def page_3():
     st.header("Wie viele Personen sollen ein Abibuch bekommen?")
     options = ["50-60", "61-70", "71-80", "81-90", "91-100", "101-110", "111-120", "120+"]
-    choice = st.radio("", options)
+    choice = st.radio("", options, key="persons")
     st.info("Hinweis: Wie groß ist dein Jahrgang? Sollen Lehrer oder weitere Personen ebenfalls ein Abibuch erhalten?")
-    if choice:
+    if choice is not None:
         st.session_state.selected_persons = choice
         go_to_page(4)
     st.button("Zurück", on_click=go_back)
@@ -63,8 +66,8 @@ def page_3():
 def page_4():
     st.header("Willst du eine digitale Version deines Abibuchs?")
     options = ["Ja", "Nein", "Ich will ausschließlich eine digitale Version"]
-    choice = st.radio("", options)
-    if choice:
+    choice = st.radio("", options, key="digital_option")
+    if choice is not None:
         st.session_state.selected_digital_option = choice
         go_to_page(5)
     st.button("Zurück", on_click=go_back)
@@ -95,8 +98,8 @@ def page_5():
 def page_6():
     st.header("Wie viel Speicherplatz benötigst du?")
     options = ["32 GB", "64 GB", "124 GB", "248 GB"]
-    choice = st.radio("", options)
-    if choice:
+    choice = st.radio("", options, key="storage")
+    if choice is not None:
         st.session_state.selected_storage = choice
         if st.session_state.selected_digital_option == "Ich will ausschließlich eine digitale Version":
             go_to_page(9)
@@ -106,16 +109,16 @@ def page_6():
 
 def page_7():
     st.header("Welches Cover soll dein Abibuch haben?")
-    choice = st.radio("", ["Hard-Cover", "Soft-Cover"])
-    if choice:
+    choice = st.radio("", ["Hard-Cover", "Soft-Cover"], key="cover")
+    if choice is not None:
         st.session_state.selected_cover = choice
         go_to_page(8)
     st.button("Zurück", on_click=go_back)
 
 def page_8():
     st.header("Welches Format soll dein Abibuch haben?")
-    choice = st.radio("", ["DIN A4 (210x297 mm)", "Buchformat (170x240 mm)"])
-    if choice:
+    choice = st.radio("", ["DIN A4 (210x297 mm)", "Buchformat (170x240 mm)"], key="format")
+    if choice is not None:
         st.session_state.selected_format = choice
         go_to_page(9)
     st.button("Zurück", on_click=go_back)
