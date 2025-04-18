@@ -5,7 +5,7 @@ if "page" not in st.session_state:
     st.session_state.page = 0
 
 if "history" not in st.session_state:
-    st.session_state.history = []  # Tracks visited pages
+    st.session_state.history = []
 
 if "selected_year" not in st.session_state:
     st.session_state.selected_year = None
@@ -28,22 +28,17 @@ if "selected_cover" not in st.session_state:
 if "selected_format" not in st.session_state:
     st.session_state.selected_format = None
 
-
 # --- Navigation Functions ---
 def go_to_page(new_page):
-    """Handles page navigation and stores history for the back button."""
     if st.session_state.page != new_page:
         st.session_state.history.append(st.session_state.page)
         st.session_state.page = new_page
         st.rerun()
 
-
 def go_back():
-    """Moves back to the last visited page."""
     if st.session_state.history:
         st.session_state.page = st.session_state.history.pop()
         st.rerun()
-
 
 # --- UI Pages ---
 st.title("Mein Digitales Abibuch")
@@ -59,9 +54,7 @@ elif st.session_state.page == 1:
     st.subheader("Für welches Jahr ist dein Abibuch?")
     current_year = 2025
     years = [current_year - 1, current_year, current_year, current_year + 1, current_year + 2]
-
     st.session_state.selected_year = st.radio("Jahr auswählen:", years, on_change=lambda: go_to_page(2))
-
     st.button("Zurück", on_click=go_back)
 
 # --- Page 2: Select Number of People ---
@@ -72,7 +65,6 @@ elif st.session_state.page == 2:
         ["50-60", "61-70", "71-80", "81-90", "91-100", "101-110", "111-120", "120+"],
         on_change=lambda: go_to_page(3),
     )
-
     st.markdown("ℹ️ **Hinweis:** Wie groß ist dein Jahrgang? Sollen Lehrer oder weitere Personen ebenfalls ein Abibuch erhalten?")
     st.button("Zurück", on_click=go_back)
 
@@ -84,7 +76,6 @@ elif st.session_state.page == 3:
         ["Ja", "Nein", "Ich will ausschließlich eine digitale Version"],
         on_change=lambda: go_to_page(4),
     )
-
     st.button("Zurück", on_click=go_back)
 
 # --- Page 4: Select Content (Checkboxes) ---
@@ -117,35 +108,44 @@ elif st.session_state.page == 4:
 # --- Page 5: Select Storage (Only if Digital is Chosen) ---
 elif st.session_state.page == 5:
     st.subheader("Wie viel Speicherplatz benötigst du?")
+
+    if st.session_state.selected_digital_option == "Ich will ausschließlich eine digitale Version":
+        next_page = 8
+    else:
+        next_page = 6
+
     st.session_state.selected_storage = st.radio(
         "Speicherplatz wählen:",
         ["32GB", "64GB", "124GB", "248GB"],
-        on_change=lambda: go_to_page(6 if st.session_state.selected_digital_option == "Ja" else 8),
+        on_change=lambda: go_to_page(next_page),
     )
-
     st.button("Zurück", on_click=go_back)
 
 # --- Page 6: Select Cover (Only for Print Versions) ---
 elif st.session_state.page == 6:
-    st.subheader("Welches Cover soll dein Abibuch haben?")
-    st.session_state.selected_cover = st.radio(
-        "Cover wählen:",
-        ["Hard-Cover", "Soft-Cover"],
-        on_change=lambda: go_to_page(7),
-    )
-
-    st.button("Zurück", on_click=go_back)
+    if st.session_state.selected_digital_option == "Ich will ausschließlich eine digitale Version":
+        go_to_page(8)
+    else:
+        st.subheader("Welches Cover soll dein Abibuch haben?")
+        st.session_state.selected_cover = st.radio(
+            "Cover wählen:",
+            ["Hard-Cover", "Soft-Cover"],
+            on_change=lambda: go_to_page(7),
+        )
+        st.button("Zurück", on_click=go_back)
 
 # --- Page 7: Select Format (Only for Print Versions) ---
 elif st.session_state.page == 7:
-    st.subheader("Welches Format soll dein Abibuch haben?")
-    st.session_state.selected_format = st.radio(
-        "Format wählen:",
-        ["DIN A4 (210x297 mm)", "Buchformat (170x240 mm)"],
-        on_change=lambda: go_to_page(8),
-    )
-
-    st.button("Zurück", on_click=go_back)
+    if st.session_state.selected_digital_option == "Ich will ausschließlich eine digitale Version":
+        go_to_page(8)
+    else:
+        st.subheader("Welches Format soll dein Abibuch haben?")
+        st.session_state.selected_format = st.radio(
+            "Format wählen:",
+            ["DIN A4 (210x297 mm)", "Buchformat (170x240 mm)"],
+            on_change=lambda: go_to_page(8),
+        )
+        st.button("Zurück", on_click=go_back)
 
 # --- Page 8: Summary Page ---
 elif st.session_state.page == 8:
@@ -162,8 +162,5 @@ elif st.session_state.page == 8:
 
     st.button("Zurück", on_click=go_back)
     st.button("Bestätigen", on_click=lambda: st.success("Vielen Dank für deine Auswahl!"))
-
-
-
 
 
