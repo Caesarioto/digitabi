@@ -1,34 +1,23 @@
 import streamlit as st
+from datetime import datetime
 
 # --- Session State Initialization ---
-if "page" not in st.session_state:
-    st.session_state.page = 0
+defaults = {
+    "page": 1,
+    "history": [],
+    "selected_year": None,
+    "selected_persons": None,
+    "selected_digital_option": None,
+    "selected_content": [],
+    "selected_storage": None,
+    "selected_cover": None,
+    "selected_format": None,
+}
+for key, val in defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = val
 
-if "history" not in st.session_state:
-    st.session_state.history = []
-
-if "selected_year" not in st.session_state:
-    st.session_state.selected_year = None
-
-if "selected_persons" not in st.session_state:
-    st.session_state.selected_persons = None
-
-if "selected_digital_option" not in st.session_state:
-    st.session_state.selected_digital_option = None
-
-if "selected_content" not in st.session_state:
-    st.session_state.selected_content = []
-
-if "selected_storage" not in st.session_state:
-    st.session_state.selected_storage = None
-
-if "selected_cover" not in st.session_state:
-    st.session_state.selected_cover = None
-
-if "selected_format" not in st.session_state:
-    st.session_state.selected_format = None
-
-# --- Navigation Functions ---
+# --- Navigation ---
 def go_to_page(new_page):
     if st.session_state.page != new_page:
         st.session_state.history.append(st.session_state.page)
@@ -40,127 +29,132 @@ def go_back():
         st.session_state.page = st.session_state.history.pop()
         st.rerun()
 
-# --- UI Pages ---
-st.title("Mein Digitales Abibuch")
+# --- Banner ---
+st.markdown("<h1 style='text-align:center;'>📘 Mein Digitales Abibuch</h1><hr>", unsafe_allow_html=True)
 
-# --- Page 0: Start Page ---
-if st.session_state.page == 0:
-    st.image("bildname.png", width=300)
+# --- Seite 1 ---
+if st.session_state.page == 1:
     st.title("Berechne den Preis deines Abibuchs in einer Minute!")
-    st.button("Los geht's!", on_click=lambda: go_to_page(1))
+    st.markdown("###")
+    st.markdown("###")
+    st.markdown("###")
+    st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
+    st.button("Los geht’s!", on_click=lambda: go_to_page(2))
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# --- Page 1: Select Year ---
-elif st.session_state.page == 1:
-    st.subheader("Für welches Jahr ist dein Abibuch?")
-    current_year = 2025
-    years = [current_year - 1, current_year, current_year, current_year + 1, current_year + 2]
-    st.session_state.selected_year = st.radio("Jahr auswählen:", years, on_change=lambda: go_to_page(2))
-    st.button("Zurück", on_click=go_back)
-
-# --- Page 2: Select Number of People ---
+# --- Seite 2: Jahr ---
 elif st.session_state.page == 2:
-    st.subheader("Wie viele Personen sollen ein Abibuch bekommen?")
-    st.session_state.selected_persons = st.radio(
-        "Anzahl der Personen:",
-        ["50-60", "61-70", "71-80", "81-90", "91-100", "101-110", "111-120", "120+"],
-        on_change=lambda: go_to_page(3),
-    )
-    st.markdown("ℹ️ **Hinweis:** Wie groß ist dein Jahrgang? Sollen Lehrer oder weitere Personen ebenfalls ein Abibuch erhalten?")
+    st.header("Für welches Jahr ist dein Abibuch?")
+    current_year = datetime.now().year
+    years = [current_year - 1, current_year, current_year + 1, current_year + 2]
+    st.session_state.selected_year = st.radio("Wähle das Jahr:", years)
+    if st.session_state.selected_year:
+        go_to_page(3)
     st.button("Zurück", on_click=go_back)
 
-# --- Page 3: Digital Version Selection ---
+# --- Seite 3: Personenanzahl ---
 elif st.session_state.page == 3:
-    st.subheader("Willst du eine digitale Version deines Abibuchs?")
+    st.header("Wie viele Personen sollen ein Abibuch bekommen?")
+    st.session_state.selected_persons = st.radio(
+        "Anzahl wählen:",
+        ["50-60", "61-70", "71-80", "81-90", "91-100", "101-110", "111-120", "120+"]
+    )
+    st.info("Hinweis: Wie groß ist dein Jahrgang? Sollen Lehrer oder weitere Personen ebenfalls ein Abibuch erhalten?")
+    if st.session_state.selected_persons:
+        go_to_page(4)
+    st.button("Zurück", on_click=go_back)
+
+# --- Seite 4: Digital-Version ---
+elif st.session_state.page == 4:
+    st.header("Willst du eine digitale Version deines Abibuchs?")
     st.session_state.selected_digital_option = st.radio(
         "Digitale Version?",
-        ["Ja", "Nein", "Ich will ausschließlich eine digitale Version"],
-        on_change=lambda: go_to_page(4),
+        ["Ja", "Nein", "Ich will ausschließlich eine digitale Version"]
     )
+    if st.session_state.selected_digital_option:
+        go_to_page(5)
     st.button("Zurück", on_click=go_back)
 
-# --- Page 4: Select Content (Checkboxes) ---
-elif st.session_state.page == 4:
-    st.subheader("Welche Inhalte sollen in deinem Abibuch sein?")
-
-    options = ["Schüler-Steckbriefe", "Lehrer-Steckbriefe", "lustige Zitate", "Videos",
-               "Sprachmemos", "Fotos", "Schüler-Rankings", "Lehrer-Rankings", "Klassenlisten"]
-
-    disabled_options = ["Videos", "Sprachmemos"] if st.session_state.selected_digital_option == "Nein" else []
-
-    selected_content = []
-    for option in options:
-        disabled = option in disabled_options
-        col1, col2 = st.columns([8, 1])
-        with col1:
-            if st.checkbox(option, key=option, disabled=disabled):
-                selected_content.append(option)
-        with col2:
-            if disabled:
-                st.markdown("❌")
-                st.markdown("<span title='Nur bei digitaler Version verfügbar'>ℹ️</span>", unsafe_allow_html=True)
-
-    st.session_state.selected_content = selected_content
-
-    next_page = 5 if st.session_state.selected_digital_option in ["Ja", "Ich will ausschließlich eine digitale Version"] else 6
-    st.button("Weiter", on_click=lambda: go_to_page(next_page))
-    st.button("Zurück", on_click=go_back)
-
-# --- Page 5: Select Storage (Only if Digital is Chosen) ---
+# --- Seite 5: Inhalte ---
 elif st.session_state.page == 5:
-    st.subheader("Wie viel Speicherplatz benötigst du?")
+    st.header("Welche Inhalte sollen in deinem Abibuch sein?")
+    options = [
+        "Schüler-Steckbriefe", "Lehrer-Steckbriefe", "lustige Zitate", "Videos",
+        "Sprachmemos", "Fotos", "Schüler-Rankings", "Lehrer-Rankings", "Klassenlisten"
+    ]
 
-    if st.session_state.selected_digital_option == "Ich will ausschließlich eine digitale Version":
-        next_page = 8
-    else:
-        next_page = 6
+    disabled = []
+    if st.session_state.selected_digital_option == "Nein":
+        disabled = ["Videos", "Sprachmemos"]
 
-    st.session_state.selected_storage = st.radio(
-        "Speicherplatz wählen:",
-        ["32GB", "64GB", "124GB", "248GB"],
-        on_change=lambda: go_to_page(next_page),
-    )
+    selected = []
+    for opt in options:
+        cols = st.columns([0.9, 0.1])
+        with cols[0]:
+            if st.checkbox(opt, key=opt, disabled=opt in disabled):
+                selected.append(opt)
+        with cols[1]:
+            if opt in disabled:
+                st.markdown("❌")
+                st.markdown(
+                    "<span title='Nur bei digitaler Version verfügbar'>ℹ️</span>",
+                    unsafe_allow_html=True,
+                )
+    st.session_state.selected_content = selected
+
+    if st.button("Weiter"):
+        if st.session_state.selected_digital_option in ["Ja", "Ich will ausschließlich eine digitale Version"]:
+            go_to_page(6)
+        else:
+            go_to_page(7)
     st.button("Zurück", on_click=go_back)
 
-# --- Page 6: Select Cover (Only for Print Versions) ---
+# --- Seite 6: Speicherplatz ---
 elif st.session_state.page == 6:
-    if st.session_state.selected_digital_option == "Ich will ausschließlich eine digitale Version":
-        go_to_page(8)
-    else:
-        st.subheader("Welches Cover soll dein Abibuch haben?")
-        st.session_state.selected_cover = st.radio(
-            "Cover wählen:",
-            ["Hard-Cover", "Soft-Cover"],
-            on_change=lambda: go_to_page(7),
-        )
-        st.button("Zurück", on_click=go_back)
+    st.header("Wie viel Speicherplatz benötigst du?")
+    st.session_state.selected_storage = st.radio(
+        "Speicher wählen:",
+        ["32 GB", "64 GB", "124 GB", "248 GB"]
+    )
+    if st.session_state.selected_storage:
+        if st.session_state.selected_digital_option == "Ja":
+            go_to_page(7)
+        else:
+            go_to_page(9)
+    st.button("Zurück", on_click=go_back)
 
-# --- Page 7: Select Format (Only for Print Versions) ---
+# --- Seite 7: Cover ---
 elif st.session_state.page == 7:
-    if st.session_state.selected_digital_option == "Ich will ausschließlich eine digitale Version":
+    st.header("Welches Cover soll dein Abibuch haben?")
+    st.session_state.selected_cover = st.radio("Cover wählen:", ["Hard-Cover", "Soft-Cover"])
+    if st.session_state.selected_cover:
         go_to_page(8)
-    else:
-        st.subheader("Welches Format soll dein Abibuch haben?")
-        st.session_state.selected_format = st.radio(
-            "Format wählen:",
-            ["DIN A4 (210x297 mm)", "Buchformat (170x240 mm)"],
-            on_change=lambda: go_to_page(8),
-        )
-        st.button("Zurück", on_click=go_back)
+    st.button("Zurück", on_click=go_back)
 
-# --- Page 8: Summary Page ---
+# --- Seite 8: Format ---
 elif st.session_state.page == 8:
-    st.subheader("Meine Auswahl")
+    st.header("Welches Format soll dein Abibuch haben?")
+    st.session_state.selected_format = st.radio(
+        "Format wählen:",
+        ["DIN A4 (210x297 mm)", "Buchformat (170x240 mm)"]
+    )
+    if st.session_state.selected_format:
+        go_to_page(9)
+    st.button("Zurück", on_click=go_back)
+
+# --- Seite 9: Zusammenfassung ---
+elif st.session_state.page == 9:
+    st.header("Meine Auswahl")
     st.write(f"**Jahr:** {st.session_state.selected_year}")
-    st.write(f"**Anzahl Personen:** {st.session_state.selected_persons}")
-    st.write(f"**Digitale Version:** {st.session_state.selected_digital_option}")
+    st.write(f"**Personenzahl:** {st.session_state.selected_persons}")
+    st.write(f"**Digitaloption:** {st.session_state.selected_digital_option}")
     st.write(f"**Inhalte:** {', '.join(st.session_state.selected_content)}")
     if st.session_state.selected_digital_option in ["Ja", "Ich will ausschließlich eine digitale Version"]:
-        st.write(f"**Speicherplatz:** {st.session_state.selected_storage}")
+        st.write(f"**Speicher:** {st.session_state.selected_storage}")
     if st.session_state.selected_digital_option != "Ich will ausschließlich eine digitale Version":
         st.write(f"**Cover:** {st.session_state.selected_cover}")
         st.write(f"**Format:** {st.session_state.selected_format}")
-
+    st.success("Bitte überprüfe deine Angaben.")
     st.button("Zurück", on_click=go_back)
-    st.button("Bestätigen", on_click=lambda: st.success("Vielen Dank für deine Auswahl!"))
 
 
