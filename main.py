@@ -1,4 +1,4 @@
-import streamlit as st 
+import streamlit as st
 
 # --- Globale Session State Variablen ---
 defaults = {
@@ -18,31 +18,46 @@ for key, value in defaults.items():
 
 # --- Helper Funktionen ---
 def show_header():
-    """Zeigt das allgemeine Header-Bild und ein optionales Titelbild."""
+    """Zeigt das allgemeine Header-Bild."""
     st.image("bildname.png", width=300)
 
 def next_page():
-    """Wechselt zur nächsten Seite, berücksichtigt 'Nur digital'- oder 'Nein'-Option."""
-    if st.session_state.page == 4 and st.session_state.selected_digital_option == "Nein":
-        st.session_state.page = 6  # Überspringe Speicherplatz bei "Nein"
-    elif st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 8  # Überspringe Format & Cover bei "Nur digital"
+    """Wechselt zur nächsten Seite, berücksichtigt die Auswahl der digitalen Version."""
+    if st.session_state.page == 4:
+        if st.session_state.selected_digital_option == "Nein":
+            st.session_state.page = 6  # Überspringt Speicherplatz-Seite
+        else:
+            st.session_state.page += 1
+    elif st.session_state.page == 5:
+        if st.session_state.selected_digital_option == "Nur digital":
+            st.session_state.page = 8  # Überspringt Format & Cover
+        else:
+            st.session_state.page += 1
     else:
         st.session_state.page += 1
 
-
 def prev_page():
-    """Geht zur vorherigen Seite, berücksichtigt 'Nur digital'-Option."""
-    if st.session_state.page == 8 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 5  
-    elif st.session_state.page == 6 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 5  
+    """Geht zur vorherigen Seite, berücksichtigt die Auswahl der digitalen Version."""
+    if st.session_state.page == 8:
+        if st.session_state.selected_digital_option == "Nur digital":
+            st.session_state.page = 5
+        else:
+            st.session_state.page = 7
+    elif st.session_state.page == 6:
+        if st.session_state.selected_digital_option == "Nein":
+            st.session_state.page = 4
+        elif st.session_state.selected_digital_option == "Nur digital":
+            st.session_state.page = 5
+        else:
+            st.session_state.page = 5
+    elif st.session_state.page == 7:
+        st.session_state.page = 6
     else:
         st.session_state.page = max(0, st.session_state.page - 1)
 
 # --- Seiteninhalt ---
 show_header()
-progress = st.progress(st.session_state.page / 8)  # Fortschrittsanzeige
+st.progress(st.session_state.page / 8)  # Fortschrittsanzeige
 
 if st.session_state.page == 0:
     st.title("Berechne in unter 1 Minute wie viel dein Abibuch kostet!")
@@ -67,19 +82,14 @@ elif st.session_state.page == 3:
 
 elif st.session_state.page == 4:
     st.title("Welche Inhalte möchtest du in deinem Abibuch?")
-
     all_options = ["Lehrer-Steckbriefe", "Schüler-Steckbriefe", "Videos", "Sprachmemos",
                    "Fotos", "Schüler-Rankings", "Lehrer-Rankings", "Klassenlisten"]
-
-    # Wenn "Nein" bei digital gewählt wurde → keine Videos & Sprachmemos
     if st.session_state.selected_digital_option == "Nein":
         options = [opt for opt in all_options if opt not in ["Videos", "Sprachmemos"]]
     else:
         options = all_options
-
     st.session_state.selected_content = st.multiselect("Wähle Inhalte aus:", options)
     st.button("Weiter", on_click=next_page)
-
 
 elif st.session_state.page == 5:
     st.title("Wie viel Speicherplatz benötigst du für deine digitale Version?")
@@ -102,8 +112,11 @@ elif st.session_state.page == 8:
     st.write(f"**Anzahl Personen:** {st.session_state.selected_persons}")
     st.write(f"**Digitale Version:** {st.session_state.selected_digital_option}")
     st.write(f"**Inhalte:** {', '.join(st.session_state.selected_content) if st.session_state.selected_content else 'Keine Auswahl'}")
-    st.write(f"**Speicherplatz:** {st.session_state.selected_storage if st.session_state.selected_storage else 'Keine Auswahl'}")
+    if st.session_state.selected_digital_option != "Nein":
+        st.write(f"**Speicherplatz:** {st.session_state.selected_storage if st.session_state.selected_storage else 'Keine Auswahl'}")
     if st.session_state.selected_digital_option != "Nur digital":
         st.write(f"**Buchgröße:** {st.session_state.selected_size if st.session_state.selected_size else 'Keine Auswahl'}")
         st.write(f"**Cover:** {st.session_state.selected_cover if st.session_state.selected_cover else 'Keine Auswahl'}")
+    st.button("Zurück", on_click=prev_page)
     st.button("Bestätigen", on_click=lambda: st.success("Vielen Dank für deine Auswahl!"))
+
