@@ -1,4 +1,4 @@
- import streamlit as st  
+import streamlit as st 
 
 # --- Globale Session State Variablen ---
 defaults = {
