@@ -23,8 +23,16 @@ def show_header():
 
 def next_page():
     """Wechselt zur nächsten Seite, berücksichtigt 'Nur digital'- und 'Nein'-Option."""
-    if st.session_state.page == 3 and st.session_state.selected_digital_option == "Nein":
-        st.session_state.page = 6  # Überspringt digitale Inhalte
+    if st.session_state.page == 3:
+        if st.session_state.selected_digital_option == "Nein":
+            st.session_state.page = 4
+        else:
+            st.session_state.page = 4
+    elif st.session_state.page == 4:
+        if st.session_state.selected_digital_option == "Nein":
+            st.session_state.page = 6  # Überspringt Seite 5 (Speicherplatz)
+        else:
+            st.session_state.page = 5
     elif st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
         st.session_state.page = 8  # Überspringt Format & Cover
     else:
@@ -33,7 +41,7 @@ def next_page():
 def prev_page():
     """Geht zur vorherigen Seite, berücksichtigt 'Nur digital'- und 'Nein'-Option."""
     if st.session_state.page == 6 and st.session_state.selected_digital_option == "Nein":
-        st.session_state.page = 3
+        st.session_state.page = 4
     elif st.session_state.page == 8 and st.session_state.selected_digital_option == "Nur digital":
         st.session_state.page = 5
     elif st.session_state.page == 6 and st.session_state.selected_digital_option == "Nur digital":
