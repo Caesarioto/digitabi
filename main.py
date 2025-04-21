@@ -24,13 +24,10 @@ def show_header():
 def next_page():
     """Wechselt zur nächsten Seite, berücksichtigt 'Nur digital'- und 'Nein'-Option."""
     if st.session_state.page == 3:
-        if st.session_state.selected_digital_option == "Nein":
-            st.session_state.page = 4
-        else:
-            st.session_state.page = 4
+        st.session_state.page = 4
     elif st.session_state.page == 4:
         if st.session_state.selected_digital_option == "Nein":
-            st.session_state.page = 6  # Überspringt Seite 5 (Speicherplatz)
+            st.session_state.page = 6  # Überspringt Seite 5 (Speicherplatz), geht zu Format
         else:
             st.session_state.page = 5
     elif st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
@@ -40,11 +37,14 @@ def next_page():
 
 def prev_page():
     """Geht zur vorherigen Seite, berücksichtigt 'Nur digital'- und 'Nein'-Option."""
-    if st.session_state.page == 6 and st.session_state.selected_digital_option == "Nein":
-        st.session_state.page = 4
+    if st.session_state.page == 6:
+        if st.session_state.selected_digital_option == "Nein":
+            st.session_state.page = 4
+        elif st.session_state.selected_digital_option == "Nur digital":
+            st.session_state.page = 5
+        else:
+            st.session_state.page = 5
     elif st.session_state.page == 8 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 5
-    elif st.session_state.page == 6 and st.session_state.selected_digital_option == "Nur digital":
         st.session_state.page = 5
     else:
         st.session_state.page = max(0, st.session_state.page - 1)
@@ -88,7 +88,7 @@ elif st.session_state.page == 5 and st.session_state.selected_digital_option != 
     st.session_state.selected_storage = st.radio("Speicherplatz wählen:", ["32GB", "64GB", "128GB"])
     st.button("Weiter", on_click=next_page)
 
-elif st.session_state.page == 6 and st.session_state.selected_digital_option != "Nur digital":
+elif st.session_state.page == 6:
     st.title("Welche Maße soll dein Abibuch haben?")
     st.session_state.selected_size = st.radio("Buchgröße wählen:", ["DIN A4 (210x297 mm)", "Buchformat (170x210 mm)"])
     st.button("Weiter", on_click=next_page)
@@ -109,4 +109,5 @@ elif st.session_state.page == 8:
         st.write(f"**Buchgröße:** {st.session_state.selected_size if st.session_state.selected_size else 'Keine Auswahl'}")
         st.write(f"**Cover:** {st.session_state.selected_cover if st.session_state.selected_cover else 'Keine Auswahl'}")
     st.button("Bestätigen", on_click=lambda: st.success("Vielen Dank für deine Auswahl!"))
+
 
