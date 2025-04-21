@@ -22,11 +22,14 @@ def show_header():
     st.image("bildname.png", width=300)
 
 def next_page():
-    """Wechselt zur nächsten Seite, berücksichtigt 'Nur digital'-Option."""
-    if st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
-        st.session_state.page = 8  # Überspringt Format & Cover
+    """Wechselt zur nächsten Seite, berücksichtigt 'Nur digital'- oder 'Nein'-Option."""
+    if st.session_state.page == 4 and st.session_state.selected_digital_option == "Nein":
+        st.session_state.page = 6  # Überspringe Speicherplatz bei "Nein"
+    elif st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 8  # Überspringe Format & Cover bei "Nur digital"
     else:
         st.session_state.page += 1
+
 
 def prev_page():
     """Geht zur vorherigen Seite, berücksichtigt 'Nur digital'-Option."""
@@ -64,9 +67,19 @@ elif st.session_state.page == 3:
 
 elif st.session_state.page == 4:
     st.title("Welche Inhalte möchtest du in deinem Abibuch?")
-    options = ["Lehrer-Steckbriefe", "Schüler-Steckbriefe", "Videos", "Sprachmemos", "Fotos", "Schüler-Rankings", "Lehrer-Rankings", "Klassenlisten"]
+
+    all_options = ["Lehrer-Steckbriefe", "Schüler-Steckbriefe", "Videos", "Sprachmemos",
+                   "Fotos", "Schüler-Rankings", "Lehrer-Rankings", "Klassenlisten"]
+
+    # Wenn "Nein" bei digital gewählt wurde → keine Videos & Sprachmemos
+    if st.session_state.selected_digital_option == "Nein":
+        options = [opt for opt in all_options if opt not in ["Videos", "Sprachmemos"]]
+    else:
+        options = all_options
+
     st.session_state.selected_content = st.multiselect("Wähle Inhalte aus:", options)
     st.button("Weiter", on_click=next_page)
+
 
 elif st.session_state.page == 5:
     st.title("Wie viel Speicherplatz benötigst du für deine digitale Version?")
