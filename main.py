@@ -1,159 +1,96 @@
-import streamlit as st
-from datetime import datetime
+import streamlit as st 
 
-# --- Initialisieren ---
-def init_state():
-    for key, value in {
-        "page": 1,
-        "history": [],
-        "selected_year": None,
-        "selected_persons": None,
-        "selected_digital_option": None,
-        "selected_content": [],
-        "selected_storage": None,
-        "selected_cover": None,
-        "selected_format": None,
-    }.items():
-        if key not in st.session_state:
-            st.session_state[key] = value
-
-# --- Navigation ---
-def go_to_page(page):
-    if st.session_state.page != page:
-        st.session_state.history.append(st.session_state.page)
-        st.session_state.page = page
-        st.session_state._rerun = True
-
-        # Workaround to trigger rerun after session state update
-        st.experimental_rerun()
-
-def go_back():
-    if st.session_state.history:
-        st.session_state.page = st.session_state.history.pop()
-        st.experimental_rerun()
-
-# --- Banner ---
-def show_banner():
-    st.markdown("<h1 style='text-align:center;'>\U0001F4D8 Mein Digitales Abibuch</h1><hr>", unsafe_allow_html=True)
-
-# --- Seiten ---
-def page_1():
-    st.title("Berechne den Preis deines Abibuchs in einer Minute!")
-    st.markdown("\n" * 3)
-    if st.button("Los geht's!"):
-        go_to_page(2)
-
-def page_2():
-    st.header("Für welches Jahr ist dein Abibuch?")
-    current = datetime.now().year
-    options = [current - 1, current, current + 1, current + 2]
-    choice = st.radio("", options, key="year")
-    if choice is not None:
-        st.session_state.selected_year = choice
-        go_to_page(3)
-    st.button("Zurück", on_click=go_back)
-
-def page_3():
-    st.header("Wie viele Personen sollen ein Abibuch bekommen?")
-    options = ["50-60", "61-70", "71-80", "81-90", "91-100", "101-110", "111-120", "120+"]
-    choice = st.radio("", options, key="persons")
-    st.info("Hinweis: Wie groß ist dein Jahrgang? Sollen Lehrer oder weitere Personen ebenfalls ein Abibuch erhalten?")
-    if choice is not None:
-        st.session_state.selected_persons = choice
-        go_to_page(4)
-    st.button("Zurück", on_click=go_back)
-
-def page_4():
-    st.header("Willst du eine digitale Version deines Abibuchs?")
-    options = ["Ja", "Nein", "Ich will ausschließlich eine digitale Version"]
-    choice = st.radio("", options, key="digital_option")
-    if choice is not None:
-        st.session_state.selected_digital_option = choice
-        go_to_page(5)
-    st.button("Zurück", on_click=go_back)
-
-def page_5():
-    st.header("Welche Inhalte sollen in deinem Abibuch sein?")
-    opts = ["Schüler-Steckbriefe", "Lehrer-Steckbriefe", "lustige Zitate", "Videos",
-            "Sprachmemos", "Fotos", "Schüler-Rankings", "Lehrer-Rankings", "Klassenlisten"]
-    disabled = ["Videos", "Sprachmemos"] if st.session_state.selected_digital_option == "Nein" else []
-    selected = []
-    for o in opts:
-        cols = st.columns([0.9, 0.1])
-        with cols[0]:
-            if st.checkbox(o, key=o, disabled=o in disabled):
-                selected.append(o)
-        with cols[1]:
-            if o in disabled:
-                st.markdown("❌")
-                st.markdown("<span title='Nur bei digitaler Version verfügbar'>ℹ️</span>", unsafe_allow_html=True)
-    st.session_state.selected_content = selected
-    if st.button("Weiter"):
-        if st.session_state.selected_digital_option in ["Ja", "Ich will ausschließlich eine digitale Version"]:
-            go_to_page(6)
-        else:
-            go_to_page(7)
-    st.button("Zurück", on_click=go_back)
-
-def page_6():
-    st.header("Wie viel Speicherplatz benötigst du?")
-    options = ["32 GB", "64 GB", "124 GB", "248 GB"]
-    choice = st.radio("", options, key="storage")
-    if choice is not None:
-        st.session_state.selected_storage = choice
-        if st.session_state.selected_digital_option == "Ich will ausschließlich eine digitale Version":
-            go_to_page(9)
-        else:
-            go_to_page(7)
-    st.button("Zurück", on_click=go_back)
-
-def page_7():
-    st.header("Welches Cover soll dein Abibuch haben?")
-    choice = st.radio("", ["Hard-Cover", "Soft-Cover"], key="cover")
-    if choice is not None:
-        st.session_state.selected_cover = choice
-        go_to_page(8)
-    st.button("Zurück", on_click=go_back)
-
-def page_8():
-    st.header("Welches Format soll dein Abibuch haben?")
-    choice = st.radio("", ["DIN A4 (210x297 mm)", "Buchformat (170x240 mm)"], key="format")
-    if choice is not None:
-        st.session_state.selected_format = choice
-        go_to_page(9)
-    st.button("Zurück", on_click=go_back)
-
-def page_9():
-    st.header("Meine Auswahl")
-    st.write(f"**Jahr:** {st.session_state.selected_year}")
-    st.write(f"**Personenzahl:** {st.session_state.selected_persons}")
-    st.write(f"**Digitaloption:** {st.session_state.selected_digital_option}")
-    st.write(f"**Inhalte:** {', '.join(st.session_state.selected_content)}")
-    if st.session_state.selected_digital_option in ["Ja", "Ich will ausschließlich eine digitale Version"]:
-        st.write(f"**Speicherplatz:** {st.session_state.selected_storage}")
-    if st.session_state.selected_digital_option != "Ich will ausschließlich eine digitale Version":
-        st.write(f"**Cover:** {st.session_state.selected_cover}")
-        st.write(f"**Format:** {st.session_state.selected_format}")
-    st.success("Bitte überprüfe deine Angaben.")
-    st.button("Zurück", on_click=go_back)
-
-# --- Main ---
-init_state()
-show_banner()
-page = st.session_state.page
-
-pages = {
-    1: page_1,
-    2: page_2,
-    3: page_3,
-    4: page_4,
-    5: page_5,
-    6: page_6,
-    7: page_7,
-    8: page_8,
-    9: page_9
+# --- Globale Session State Variablen ---
+defaults = {
+    "page": 0,
+    "selected_year": None,
+    "selected_persons": 85,
+    "selected_digital_option": None,
+    "selected_content": [],
+    "selected_storage": None,
+    "selected_size": None,
+    "selected_cover": None,
 }
 
-if page in pages:
-    pages[page]()
+for key, value in defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = value
 
+# --- Helper Funktionen ---
+def show_header():
+    """Zeigt das allgemeine Header-Bild und ein optionales Titelbild."""
+    st.image("bildname.png", width=300)
+
+def next_page():
+    """Wechselt zur nächsten Seite, berücksichtigt 'Nur digital'-Option."""
+    if st.session_state.page == 5 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 8  # Überspringt Format & Cover
+    else:
+        st.session_state.page += 1
+
+def prev_page():
+    """Geht zur vorherigen Seite, berücksichtigt 'Nur digital'-Option."""
+    if st.session_state.page == 8 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 5  
+    elif st.session_state.page == 6 and st.session_state.selected_digital_option == "Nur digital":
+        st.session_state.page = 5  
+    else:
+        st.session_state.page = max(0, st.session_state.page - 1)
+
+# --- Seiteninhalt ---
+show_header()
+progress = st.progress(st.session_state.page / 8)  # Fortschrittsanzeige
+
+if st.session_state.page == 0:
+    st.title("Berechne in unter 1 Minute wie viel dein Abibuch kostet!")
+    st.button("Los geht's!", on_click=next_page)
+
+elif st.session_state.page == 1:
+    st.title("Mein Digitales Abibuch")
+    st.subheader("Für welches Jahr ist dein Abibuch?")
+    years = [2024, 2025, 2026, 2027]
+    st.session_state.selected_year = st.radio("Jahr auswählen", years)
+    st.button("Weiter", on_click=next_page)
+
+elif st.session_state.page == 2:
+    st.title("Wie viele Personen sollen ein Abibuch bekommen?")
+    st.session_state.selected_persons = st.slider("Anzahl Personen", 1, 170, 85)
+    st.button("Weiter", on_click=next_page)
+
+elif st.session_state.page == 3:
+    st.title("Möchtest du eine digitale Version deines Abibuchs?")
+    st.session_state.selected_digital_option = st.radio("Digitale Version?", ["Ja", "Nein", "Nur digital"])
+    st.button("Weiter", on_click=next_page)
+
+elif st.session_state.page == 4:
+    st.title("Welche Inhalte möchtest du in deinem Abibuch?")
+    options = ["Lehrer-Steckbriefe", "Schüler-Steckbriefe", "Videos", "Sprachmemos", "Fotos", "Schüler-Rankings", "Lehrer-Rankings", "Klassenlisten"]
+    st.session_state.selected_content = st.multiselect("Wähle Inhalte aus:", options)
+    st.button("Weiter", on_click=next_page)
+
+elif st.session_state.page == 5:
+    st.title("Wie viel Speicherplatz benötigst du für deine digitale Version?")
+    st.session_state.selected_storage = st.radio("Speicherplatz wählen:", ["32GB", "64GB", "128GB"])
+    st.button("Weiter", on_click=next_page)
+
+elif st.session_state.page == 6 and st.session_state.selected_digital_option != "Nur digital":
+    st.title("Welche Maße soll dein Abibuch haben?")
+    st.session_state.selected_size = st.radio("Buchgröße wählen:", ["DIN A4 (210x297 mm)", "Buchformat (170x210 mm)"])
+    st.button("Weiter", on_click=next_page)
+
+elif st.session_state.page == 7 and st.session_state.selected_digital_option != "Nur digital":
+    st.title("Welche Art von Cover soll dein Abibuch haben?")
+    st.session_state.selected_cover = st.radio("Cover wählen:", ["Hard-Cover", "Soft-Cover"])
+    st.button("Weiter", on_click=next_page)
+
+elif st.session_state.page == 8:
+    st.title("Meine Auswahl")
+    st.write(f"**Jahr:** {st.session_state.selected_year}")
+    st.write(f"**Anzahl Personen:** {st.session_state.selected_persons}")
+    st.write(f"**Digitale Version:** {st.session_state.selected_digital_option}")
+    st.write(f"**Inhalte:** {', '.join(st.session_state.selected_content) if st.session_state.selected_content else 'Keine Auswahl'}")
+    st.write(f"**Speicherplatz:** {st.session_state.selected_storage if st.session_state.selected_storage else 'Keine Auswahl'}")
+    if st.session_state.selected_digital_option != "Nur digital":
+        st.write(f"**Buchgröße:** {st.session_state.selected_size if st.session_state.selected_size else 'Keine Auswahl'}")
+        st.write(f"**Cover:** {st.session_state.selected_cover if st.session_state.selected_cover else 'Keine Auswahl'}")
+    st.button("Bestätigen", on_click=lambda: st.success("Vielen Dank für deine Auswahl!"))
